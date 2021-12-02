@@ -1,11 +1,7 @@
 case class Location(position: Int, depth:Int, aim: Int)
 object Location { val empty = Location(0,0,0) }
 
-enum Direction:
-  case Forward extends Direction
-  case Up extends Direction
-  case Down extends Direction
-  case Unknown extends Direction
+enum Direction: Forward, Up, Down, Unknown
 
 case class Move(direction:Direction, distance:Int)
 object Move { val empty = Move(Direction.Unknown, 0) }

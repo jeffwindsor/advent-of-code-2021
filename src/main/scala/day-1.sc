@@ -1,19 +1,15 @@
 //  count the number of increases between measurements
-def count_increases(inputs: List[Int]) =
-  inputs.sliding(2)
-    .map(window => if window(0) < window(1) then 1 else 0)
-    .sum
+def count_increases(inputs: List[Int]) = inputs
+  .sliding(2)
+  .count(window => window(0) < window(1))
 
 //  consider sums of a three-measurement sliding window.
 //  count the of increases between three-measurement sums
 def count_increase_between_windows(inputs: List[Int]) =
-  count_increases(inputs.sliding(3)
+  val threeMeasurementSums = inputs
+    .sliding(3)
     .map(_.sum)
-    .toList
-  )
-
-
-
+  count_increases(threeMeasurementSums.toList)
 
 // get some answers
 val test_inputs = List(199, 200, 208, 210, 200, 207, 240, 269, 260, 263)

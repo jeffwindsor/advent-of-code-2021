@@ -8,7 +8,7 @@ def move(Moves: Moves)(current: Location, input:String): Location = input.split(
   case Array("forward", x) => Moves.forward(current, x.toInt)
   case Array("down", x)    => Moves.down(current, x.toInt)
   case Array("up", x)      => Moves.up(current, x.toInt)
-  case _                   => Location.empty
+  case _                   => current
 
 val part1Moves = Moves(
   forward = (l, x) => l.copy(position = l.position + x),

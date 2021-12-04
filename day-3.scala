@@ -32,8 +32,8 @@ def answer2(readings: List[String]) =
   bitsToDecimal(matchBits(mostCommon,readings)) * bitsToDecimal(matchBits(leastCommon,readings))
 
 
-println(answer1(test_inputs))
-println(answer1(submission_inputs))
+println("Part 1 [test]  : " + answer1(test_inputs))
+println("Part 1 [submit]: " + answer1(submission_inputs))
 
-println(answer2(test_inputs))
-println(answer2(submission_inputs))
+println("Part 2 [test]  : " + answer2(test_inputs))
+println("Part 2 [submit]: " + answer2(submission_inputs))

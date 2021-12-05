@@ -36,8 +36,8 @@ def winner(boards:List[Board]):Option[Board] = boards match {
 }
 def score(drawn:Value, board: Board):Answer = {
   val matchedCoordinates = board.matches.filter{ case (k,v) => !v }
-  val matchedNumbers     = board.numbers.filter{ case (k,v) => matchedCoordinates.contains(v) }.keys.sum
-  drawn * matchedNumbers
+  val matchedNumbers     = board.numbers.filter{ case (k,v) => matchedCoordinates.contains(v) }.keys
+  drawn * matchedNumbers.sum
 } 
 
 def applyNumber(number:Value, board:Board):Board = 
@@ -63,13 +63,19 @@ def playToLose(game: Game):Answer = {
   val drawn = game.numbers.head
   val boards = applyNumber(drawn, game.boards)
   winner(boards) match{
-    case None => playToWin(Game(game.numbers.tail, boards))
-    case Some(board) => score(drawn, board)
+    case None => playToLose(Game(game.numbers.tail, boards))
+    case Some(board) => {
+      if(game.boards.length == 1)
+        return score(drawn, boards.head)
+      else{
+        val removed = boards.filterNot(_ == board)
+        return playToLose(Game(game.numbers.tail, removed))
+    }}
   }
 }
 
 
 // PLAY
-println( playToWin( readGame("data/day-4.txt") ) )
-println( playToLose( readGame("data/day-4-example.txt") ) )
+println( playToWin(  readGame("data/day-4.txt") ) )
+println( playToLose( readGame("data/day-4.txt") ) )
 

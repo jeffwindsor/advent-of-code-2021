@@ -43,37 +43,33 @@ def score(drawn:Value, board: Board):Answer = {
 def applyNumber(number:Value, board:Board):Board = 
   if(board.numbers.contains(number)){
     val (rowId, colId) = board.numbers(number)
-    val ms = (board.matches + ((rowId,colId) -> true))
-    val rsi = board.rowTotals(rowId) + 1
-    val rs = (board.rowTotals + (rowId -> rsi))
-    val csi = board.colTotals(colId) + 1
-    val cs = (board.colTotals + (colId -> csi))
-    board.copy(matches=ms, rowTotals=rs, colTotals=cs)
+    val matches = (board.matches + ((rowId,colId) -> true))
+    val rowTotals = (board.rowTotals + (rowId -> (board.rowTotals(rowId) + 1)))
+    val colTotals = (board.colTotals + (colId -> (board.colTotals(colId) + 1)))
+    Board(board.numbers, matches, rowTotals, colTotals)
   } else board
 def applyNumber(number:Value, boards:List[Board]):List[Board] = boards.map(applyNumber(number,_)) 
 
-def play(game: Game):Answer = {
+def playToWin(game: Game):Answer = {
   val drawn = game.numbers.head
   val boards = applyNumber(drawn, game.boards)
   winner(boards) match{
-    case None => play(Game(game.numbers.tail, boards))
+    case None => playToWin(Game(game.numbers.tail, boards))
     case Some(board) => score(drawn, board)
   }
 }
 
-///=========================================================================
-def printGame(game: Game) = { 
-  for(number <- game.numbers) { print(number + " ") }
-  println()
-    println("--------------------")
-  for(board <- game.boards){ 
-    println(board) 
-    println("--------------------")
+def playToLose(game: Game):Answer = {
+  val drawn = game.numbers.head
+  val boards = applyNumber(drawn, game.boards)
+  winner(boards) match{
+    case None => playToWin(Game(game.numbers.tail, boards))
+    case Some(board) => score(drawn, board)
   }
 }
-///=========================================================================
 
-val game = readGame("data/day-4.txt")
-printGame(game) 
-println( play(game) )
+
+// PLAY
+println( playToWin( readGame("data/day-4.txt") ) )
+println( playToLose( readGame("data/day-4-example.txt") ) )
 

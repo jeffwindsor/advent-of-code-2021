@@ -29,9 +29,6 @@ def answer(movement:(Location,Move) => Location)(moves: Seq[Move]): Int = {
 
 // Answers
 for(file <- Seq("data/day-2-example.txt", "data/day-2.txt"); 
-     function <- Seq(answer(noAim)(_), answer(withAim)(_)))
-    {
-       val moves = readFrom(file)
-       val output = function(moves)
-       println(output)
+    function <- Seq(answer(noAim)(_), answer(withAim)(_))){
+       println(function(readFrom(file)))
     }

@@ -27,6 +27,4 @@ for(file <- Seq("data/day-5-example.txt", "data/day-5.txt");
      function <- Seq(hovOnly(_), answer(_))){
   val output = function(readFrom(file))
   println(output)
-  //for(o <- output){ println(o) }
-  //println(output.size)
 }

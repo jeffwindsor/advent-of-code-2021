@@ -1,42 +1,37 @@
-case class Location(position: Int, depth:Int, aim: Int)
-object Location { val empty = Location(0,0,0) }
+// Dive!
+//
+case class Location(position:Int, depth:Int, aim:Int)
+type Move = (String,Int)
 
-enum Direction: Forward, Up, Down, Unknown
+def readFrom(filename:String) = {
+  val filelines = scala.io.Source.fromFile(filename).getLines.filter(_.nonEmpty)
+  filelines.map(_.split(' ')).map(a => (a(0), a(1).toInt)).toSeq
+}
 
-case class Move(direction:Direction, distance:Int)
-object Move { val empty = Move(Direction.Unknown, 0) }
+def noAim(location:Location, move:Move):Location = move match {
+    case ("forward", x) => Location(location.position + x, location.depth, 0)
+    case ("down", x)    => Location(location.position, location.depth + x, 0)
+    case ("up", x)      => Location(location.position, location.depth - x, 0)
+    case _              => location
+  }
 
-def parserInput(input:String): Move = input.split(' ') match
-  case Array("forward", distance) => Move(Direction.Forward, distance.toInt)
-  case Array("down", distance)    => Move(Direction.Down, distance.toInt)
-  case Array("up", distance)      => Move(Direction.Up, distance.toInt)
-  case _                          => Move.empty
+def withAim(location:Location, move:Move):Location = move match {
+    case ("forward", x) => Location(location.position + x, location.depth + (location.aim * x), location.aim)
+    case ("down", x)    => Location(location.position, location.depth, location.aim + x)
+    case ("up", x)      => Location(location.position, location.depth, location.aim - x)
+    case _              => location
+  }
 
-def moveLocation1(current: Location, move: Move): Location = move match
-    case Move(Direction.Forward, distance) => current.copy(position = current.position + distance)
-    case Move(Direction.Down, distance)    => current.copy(depth = current.depth + distance)
-    case Move(Direction.Up, distance)      => current.copy(depth = current.depth - distance)
-    case _                                 => current
+def answer(movement:(Location,Move) => Location)(moves: Seq[Move]): Int = { 
+  val location = moves.foldLeft(Location(0,0,0))(movement)
+  location.position * location.depth
+}
 
-def moveLocation2(current: Location, move: Move): Location = move match
-    case Move(Direction.Forward, distance) => current.copy(
-      position = current.position + distance,
-      depth    = current.depth + (current.aim * distance))
-    case Move(Direction.Down, distance)    => current.copy(aim = current.aim + distance)
-    case Move(Direction.Up, distance)      => current.copy(aim = current.aim - distance)
-    case _                                 => current
-
-// input parsing
-def answer(moveFunction:(Location, Move) => Location, inputs:List[String]) =
-  val l = inputs.map(parserInput).foldLeft(Location.empty)(moveFunction)
-  l.position * l.depth
-
-// inputs
-val test_inputs       = List("forward 5","down 5","forward 8", "up 3","down 8", "forward 2")
-val submission_inputs = List("forward 6", "down 2", "forward 2", "down 8", "forward 3", "down 6", "down 8", "down 9", "forward 7", "forward 8", "down 9", "down 8", "down 9", "up 8", "forward 1", "down 7", "down 3", "forward 3", "forward 1", "down 3", "forward 3", "forward 1", "up 8", "down 5", "down 1", "forward 6", "forward 2", "up 9", "down 3", "down 8", "down 3", "down 3", "up 2", "down 7", "down 3", "up 5", "forward 4", "down 9", "forward 6", "forward 3", "forward 1", "forward 3", "down 2", "up 9", "down 4", "forward 6", "down 3", "forward 2", "down 2", "up 5", "up 1", "forward 3", "forward 6", "down 6", "forward 7", "forward 1", "down 3", "down 8", "forward 2", "down 7", "up 1", "up 2", "forward 5", "down 8", "down 8", "forward 9", "forward 7", "forward 2", "forward 7", "up 6", "up 9", "down 4", "forward 4", "forward 4", "up 1", "down 7", "forward 9", "forward 3", "down 6", "down 9", "forward 7", "forward 4", "up 7", "up 6", "up 8", "down 9", "forward 1", "down 1", "forward 8", "down 7", "forward 5", "down 3", "down 3", "down 8", "down 8", "down 4", "up 4", "forward 3", "down 8", "down 9", "up 3", "up 8", "down 9", "up 5", "forward 2", "forward 5", "forward 5", "down 8", "forward 9", "forward 8", "down 5", "down 9", "forward 6", "forward 2", "forward 3", "up 1", "forward 1", "up 2", "up 2", "forward 4", "forward 8", "forward 5", "down 1", "up 4", "forward 5", "up 7", "down 5", "down 5", "forward 8", "up 2", "down 7", "down 6", "down 5", "down 5", "down 1", "down 8", "forward 9", "forward 2", "up 6", "up 4", "down 8", "forward 1", "forward 2", "down 2", "forward 7", "forward 7", "forward 3", "forward 6", "forward 8", "down 3", "forward 6", "up 5", "down 3", "down 8", "up 1", "forward 1", "down 7", "down 3", "up 5", "forward 6", "forward 8", "forward 9", "up 5", "up 5", "up 5", "forward 8", "up 5", "down 6", "down 7", "down 5", "up 7", "up 1", "up 3", "forward 8", "up 9", "down 7", "down 4", "up 6", "up 8", "up 9", "up 9", "forward 5", "up 5", "forward 2", "forward 2", "forward 6", "up 2", "down 8", "up 2", "forward 5", "down 9", "up 7", "down 9", "forward 1", "forward 8", "up 1", "forward 7", "forward 2", "down 3", "forward 3", "forward 2", "up 9", "forward 4", "forward 9", "down 9", "forward 5", "forward 1", "forward 5", "forward 8", "up 5", "forward 1", "down 4", "up 8", "up 4", "up 7", "forward 4", "down 1", "up 6", "forward 6", "down 2", "down 7", "forward 4", "up 7", "forward 7", "forward 9", "down 5", "up 5", "forward 4", "down 6", "forward 1", "up 8", "up 8", "down 8", "down 7", "forward 7", "down 3", "forward 7", "down 3", "down 5", "down 4", "up 8", "down 2", "down 2", "up 5", "forward 9", "up 9", "forward 2", "up 4", "forward 4", "down 2", "down 7", "forward 7", "down 1", "down 6", "down 4", "forward 6", "up 4", "forward 4", "down 6", "down 8", "down 3", "forward 7", "down 3", "forward 7", "down 7", "forward 4", "up 9", "down 5", "forward 7", "forward 7", "up 6", "down 3", "forward 9", "down 1", "forward 4", "up 9", "down 3", "up 9", "down 5", "up 6", "forward 1", "forward 9", "up 4", "down 3", "forward 1", "down 7", "down 2", "forward 2", "down 6", "up 4", "down 4", "up 9", "down 3", "down 9", "down 4", "down 1", "up 8", "down 2", "up 1", "forward 5", "forward 9", "forward 1", "up 4", "forward 5", "down 7", "up 6", "down 3", "forward 8", "down 1", "down 5", "forward 5", "down 5", "down 7", "down 8", "down 7", "up 6", "forward 8", "down 8", "forward 6", "down 6", "down 7", "down 3", "forward 2", "down 6", "down 8", "down 7", "down 3", "up 1", "down 7", "forward 8", "forward 2", "forward 5", "down 4", "up 4", "forward 9", "down 9", "forward 6", "down 7", "down 4", "down 8", "up 9", "forward 7", "down 4", "forward 7", "forward 1", "forward 7", "down 9", "down 7", "forward 3", "forward 3", "forward 2", "down 5", "up 5", "forward 5", "down 2", "forward 7", "forward 9", "forward 7", "down 7", "down 9", "down 5", "forward 2", "up 5", "down 3", "forward 7", "down 4", "down 3", "up 5", "down 6", "down 3", "up 4", "forward 3", "down 1", "forward 6", "forward 6", "down 8", "forward 9", "down 2", "up 3", "down 4", "down 5", "forward 3", "down 9", "forward 2", "up 3", "up 4", "forward 9", "down 2", "forward 9", "forward 3", "down 4", "down 2", "down 5", "down 4", "forward 4", "down 1", "down 9", "down 2", "forward 8", "down 5", "forward 5", "up 7", "down 5", "down 2", "forward 5", "up 4", "down 5", "up 3", "forward 7", "down 9", "forward 5", "forward 2", "forward 1", "down 7", "down 9", "down 2", "up 2", "up 2", "up 4", "down 4", "down 7", "down 3", "forward 5", "forward 3", "up 6", "down 6", "up 6", "up 9", "forward 8", "forward 4", "up 3", "forward 1", "forward 2", "up 5", "forward 5", "forward 8", "forward 7", "forward 4", "down 1", "down 8", "down 1", "forward 3", "up 1", "forward 7", "forward 4", "down 8", "forward 7", "forward 9", "forward 3", "down 9", "down 9", "down 3", "up 6", "up 1", "down 4", "forward 5", "forward 4", "forward 6", "forward 8", "down 6", "down 3", "forward 5", "forward 6", "down 4", "down 2", "up 3", "down 3", "down 7", "down 5", "down 5", "forward 6", "down 4", "forward 1", "up 2", "forward 3", "down 1", "down 4", "down 9", "down 7", "down 9", "forward 9", "down 6", "down 3", "down 2", "down 5", "up 8", "forward 5", "forward 5", "forward 4", "up 5", "forward 1", "down 9", "down 1", "up 5", "forward 8", "forward 6", "forward 5", "down 1", "up 5", "down 8", "up 7", "down 8", "down 2", "down 3", "forward 2", "up 4", "down 6", "up 6", "down 3", "down 7", "up 3", "forward 4", "down 3", "forward 4", "up 9", "forward 5", "down 2", "forward 7", "forward 5", "up 3", "up 2", "forward 2", "down 8", "down 1", "down 3", "up 5", "down 4", "forward 4", "down 1", "forward 9", "down 3", "down 7", "down 4", "down 4", "forward 7", "up 5", "forward 4", "down 8", "up 4", "forward 6", "down 1", "up 4", "forward 4", "down 6", "up 5", "up 1", "forward 2", "down 5", "forward 8", "forward 6", "down 8", "down 7", "down 7", "down 1", "forward 5", "forward 7", "forward 7", "forward 7", "up 3", "forward 9", "forward 1", "down 9", "forward 4", "up 8", "forward 1", "forward 5", "forward 4", "down 2", "forward 4", "forward 9", "forward 3", "down 1", "forward 4", "forward 9", "forward 5", "down 5", "down 5", "forward 7", "down 3", "forward 4", "down 6", "forward 7", "down 2", "down 1", "down 5", "forward 4", "forward 9", "down 4", "forward 2", "down 8", "up 5", "down 9", "forward 8", "down 3", "up 6", "down 2", "down 4", "forward 4", "up 2", "down 4", "down 4", "up 7", "down 6", "forward 4", "down 7", "forward 3", "down 1", "up 1", "down 2", "down 6", "down 4", "up 3", "down 6", "up 2", "down 6", "forward 3", "down 9", "forward 5", "down 5", "down 9", "down 9", "down 7", "forward 9", "forward 8", "forward 9", "up 9", "forward 7", "forward 4", "forward 4", "up 5", "forward 2", "down 1", "up 9", "forward 2", "forward 7", "forward 1", "down 9", "forward 9", "up 8", "up 1", "up 7", "up 7", "down 5", "forward 2", "forward 8", "forward 6", "down 7", "forward 1", "down 9", "down 4", "down 4", "down 1", "up 7", "forward 4", "forward 6", "up 5", "forward 2", "down 9", "down 7", "forward 1", "forward 2", "down 5", "forward 3", "forward 8", "forward 6", "forward 3", "forward 2", "down 1", "forward 1", "forward 1", "forward 3", "down 9", "up 9", "down 9", "down 6", "forward 7", "down 6", "forward 9", "down 9", "down 7", "down 1", "down 9", "up 9", "down 6", "forward 9", "down 6", "forward 3", "down 8", "up 5", "forward 5", "forward 8", "up 3", "down 8", "up 6", "forward 4", "down 2", "forward 6", "down 9", "forward 6", "forward 4", "forward 9", "forward 3", "down 2", "down 4", "forward 5", "down 9", "up 7", "forward 4", "up 1", "forward 1", "down 6", "forward 3", "forward 7", "forward 2", "forward 2", "down 5", "down 9", "down 3", "down 5", "up 3", "forward 1", "down 2", "down 4", "down 1", "up 9", "up 5", "up 1", "down 1", "up 9", "down 5", "up 3", "up 3", "down 7", "forward 4", "down 6", "forward 2", "forward 7", "forward 4", "down 2", "forward 6", "forward 2", "down 3", "up 3", "up 9", "forward 9", "forward 9", "forward 6", "down 8", "down 1", "forward 9", "up 1", "down 6", "forward 6", "up 5", "forward 2", "forward 6", "down 9", "forward 1", "forward 8", "down 8", "forward 4", "forward 7", "up 6", "up 1", "forward 7", "forward 3", "forward 2", "down 4", "down 7", "down 7", "down 1", "down 6", "forward 1", "down 9", "up 9", "up 9", "down 2", "down 2", "forward 5", "up 2", "forward 7", "up 5", "down 9", "forward 7", "forward 2", "down 8", "up 1", "down 5", "forward 6", "down 8", "down 7", "forward 4", "up 2", "down 8", "forward 2", "down 5", "down 4", "down 9", "down 1", "down 9", "down 6", "down 3", "forward 1", "forward 6", "up 1", "up 1", "up 9", "down 2", "down 2", "forward 5", "down 3", "forward 4", "down 3", "down 7", "down 7", "forward 4", "up 3", "forward 4", "down 3", "forward 8", "forward 1", "up 2", "up 1", "forward 1", "down 6", "down 1", "down 3", "forward 7", "down 7", "forward 4", "forward 5", "forward 3", "down 5", "forward 9", "forward 5", "down 7", "forward 6", "down 4", "down 4", "down 9", "down 3", "up 9", "forward 7", "down 7", "forward 6", "down 2", "down 9", "forward 4", "forward 1", "forward 4", "down 5", "forward 7", "down 9", "down 8", "forward 9", "forward 1", "down 9", "forward 6", "up 5", "forward 9", "down 1", "down 5", "forward 4", "forward 5", "forward 8", "down 5", "forward 9", "down 6", "down 2", "up 4", "up 8", "forward 3", "forward 4", "down 3", "forward 4", "up 6", "forward 3", "forward 8", "forward 7", "down 1", "down 9", "down 8", "down 8", "down 1", "forward 9", "up 4", "down 5", "forward 7", "down 8", "down 3", "forward 9", "down 5", "forward 7", "forward 2", "down 4", "forward 2", "forward 7", "down 6", "forward 7", "down 2", "forward 9", "down 9", "forward 8", "forward 8", "down 6", "forward 7", "down 8", "forward 7", "forward 3", "down 1", "up 8", "down 5", "down 6", "up 5", "forward 5", "forward 5", "up 5", "up 3", "up 7", "down 6", "forward 8", "forward 4", "down 2", "up 5", "forward 8", "down 6", "forward 4", "forward 2", "up 8", "down 8", "down 5", "down 4", "forward 9", "forward 9", "forward 6", "forward 6", "down 3", "up 1", "down 4", "down 8", "down 9", "down 1", "forward 3", "forward 1", "down 9", "down 3", "down 7", "forward 6", "forward 9", "down 8", "down 8", "forward 6", "forward 1", "down 3", "forward 1", "down 8", "down 3", "down 9", "up 1", "forward 6", "up 2", "down 3", "forward 4", "forward 2", "up 2", "down 5", "forward 1", "down 3", "forward 9", "forward 4", "forward 6", "down 3", "forward 7", "down 6", "up 3", "up 7", "up 5", "down 4", "forward 4", "up 1", "forward 7", "up 9", "forward 3", "up 1", "down 3", "down 4", "forward 4", "up 3", "down 6", "down 9", "down 6", "forward 4", "down 9", "down 6", "forward 4", "forward 3", "down 3", "up 7", "down 9", "forward 8")
-
-// answers
-answer(moveLocation1, test_inputs)
-answer(moveLocation1, submission_inputs)
-answer(moveLocation2, test_inputs)
-answer(moveLocation2, submission_inputs)
+// Answers
+for(file <- Seq("data/day-2-example.txt", "data/day-2.txt"); 
+     function <- Seq(answer(noAim)(_), answer(withAim)(_)))
+    {
+       val moves = readFrom(file)
+       val output = function(moves)
+       println(output)
+    }

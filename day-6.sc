@@ -26,8 +26,7 @@ def next(p:Population):Population = {
 //==============================================================================
 def readFrom(filename:String) = {
   val filelines = scala.io.Source.fromFile(filename).getLines.filter(_.nonEmpty)
-  filelines.next.split(',').map(_.toInt) 
-}
+  filelines.next.split(',').map(_.toInt) }
 
 val files = Seq("data/day-6-example.txt", "data/day-6.txt")
 val functions = Seq(run(80, _), run(256,_)) 

@@ -1,20 +1,17 @@
 // --- Day 7: The Treachery of Whales ---
 //
 
+def fuelCostByPosition(rangeOfCrabs:Seq[Int], crabs:Seq[Int]) = crabs.map(c => rangeOfCrabs.map(i => (i, math.abs(i - c)))).flatten
+def totalFuelCostByPosition(fuelCostByPosition:Seq[(Int,Int)]) = fuelCostByPosition.groupMapReduce(t => t._1)(t => t._2)(_ + _)
+
 def run(crabs:Seq[Int]) = { 
-  val rangeOfCrabs = crabs.min to crabs.max
-  val fuelCostByPosition = crabs.map(c => rangeOfCrabs.map(i => (i, math.abs(i - c))))
-  val totalFuelCostByPosition = fuelCostByPosition.flatten.groupMapReduce(t => t._1)(t => t._2)(_ + _)
-  val minFuelCostPosition = totalFuelCostByPosition.minBy(t => t._2)
-
-  for(l <- fuelCostByPosition) printColumns(l) 
-  printColumns(totalFuelCostByPosition.toList.sorted)
-
-  minFuelCostPosition._2
+  val fcp = fuelCostByPosition(crabs.min to crabs.max, crabs) 
+  val tfcp = totalFuelCostByPosition(fcp) 
+  tfcp.minBy(t => t._2)._2
 }
 
 //==============================================================================
-// Print Answers
+// Effectful
 //==============================================================================
 def readFrom(filename:String) = {
   val filelines = scala.io.Source.fromFile(filename).getLines.filter(_.nonEmpty)

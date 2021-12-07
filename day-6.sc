@@ -2,11 +2,6 @@
 //
 import scala.annotation.tailrec
 
-val restart = 6
-val start   = restart + 2
-val spawn   = 0
-val iterationsForPart1  = 80
-val iterationsForPart2  = 256
 type NumberOfFish = BigInt
 type Generation   = Int
 type Population   = Map[Generation,NumberOfFish]   
@@ -21,9 +16,9 @@ def runIterations(i:Int, p:Population):Population =
 
 def next(p:Population):Population = {
   val newPopulation = p.groupMapReduce { 
-    case (g, _) => if(g == spawn) restart else g - 1  }(f => f._2)(_ + _)
-  p.get(spawn) match {
-    case Some(numOfFish) => newPopulation + (start -> numOfFish) 
+    case (g, _) => if(g == 0) 6 else g - 1  }(f => f._2)(_ + _)
+  p.get(0) match {
+    case Some(numOfFish) => newPopulation + (8 -> numOfFish) 
     case None => newPopulation } }
 
 //==============================================================================
@@ -35,6 +30,6 @@ def readFrom(filename:String) = {
 }
 
 val files = Seq("data/day-6-example.txt", "data/day-6.txt")
-val functions = Seq(run(iterationsForPart1, _), run(iterationsForPart2,_)) 
+val functions = Seq(run(80, _), run(256,_)) 
 for(file <- files; function <- functions) println(function(readFrom(file)))
 

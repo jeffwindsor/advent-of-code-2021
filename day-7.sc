@@ -1,16 +1,18 @@
 //
 // Day 7: The Treachery of Whales
 //
+type CostF    = Int => Int
+type Crab     = Int
+type Crabs    = Iterable[Crab]
+type Position = Int
 
-def intMax = 2147483647
-def totalFuelCost(fuelCost:Int=>Int)(crabs:Iterable[Int])(position: Int) = 
-  crabs.foldLeft(0){ case (total,crab) => total + fuelCost(math.abs(position - crab)) }
-def minimumFuelCost(fuelCost:Int => Int)(crabs:Iterable[Int]) = 
-  (crabs.min to crabs.max).foldLeft(intMax){ case (minTotal, position) => minTotal min totalFuelCost(fuelCost)(crabs)(position) }
 def terminal(n:Int) = (n * (n + 1)) / 2
-
-def run1 = minimumFuelCost(identity) _
-def run2 = minimumFuelCost(distance => terminal(distance)) _
+def costAtPosition(f:CostF)(c:Crab)(p:Position) = f(math.abs(p - c))
+def totalCostAtPosition(f:CostF)(cs:Crabs)(p:Position) = cs.foldLeft(0){ case (acc,c) => acc + costAtPosition(f)(c)(p) }
+def minimumCost(f:CostF)(cs:Crabs) = { 
+  val positions = (cs.min to cs.max)
+  positions.foldLeft(2147483647){ case (acc, p) => acc min totalCostAtPosition(f)(cs)(p) }
+}
 
 //==============================================================================
 // Effectful
@@ -21,5 +23,5 @@ def readFrom(filename:String) = {
 }
 
 val files = Seq("data/day-7-example.txt", "data/day-7.txt")
-val functions = Seq(run1(_), run2(_)) 
+val functions = Seq(minimumCost(identity) _, minimumCost(terminal(_)) _) 
 for(file <- files; function <- functions) println(function(readFrom(file)))

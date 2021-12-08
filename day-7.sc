@@ -22,6 +22,6 @@ def readFrom(filename:String) = {
   filelines.next.split(',').map(_.toInt) 
 }
 
-val files = Seq("data/day-7-example.txt", "data/day-7.txt")
-val functions = Seq(minimumCost(identity) _, minimumCost(terminal(_)) _) 
-for(file <- files; function <- functions) println(function(readFrom(file)))
+val inputs = Seq("data/day-7-example.txt", "data/day-7.txt").map(readFrom(_))
+val funcs = Seq(minimumCost(identity) _, minimumCost(terminal(_)) _) 
+for(i <- inputs; f <- funcs) println(f(i))

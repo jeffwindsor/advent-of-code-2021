@@ -1,18 +1,27 @@
+//
+//  Day 8: Seven Segment Search
+//
 
-
-
-
-
-
-//==============================================================================
-// Effectful
+type SignalPatterns = List[String]
+type OutputValues = List[String]
+case class Entry(ps:SignalPatterns, os:OutputValues)
 //==============================================================================
 def readFrom(filename:String) = {
-  val filelines = scala.io.Source.fromFile(filename).getLines.filter(_.nonEmpty)
-  filelines.split(',').map(_.toInt) 
+  scala.io.Source
+    .fromFile(filename)
+    .getLines
+    .map(_.split(Array('|')))
+    .map(e => Entry(e(0).trim.split(' ').toList,e(1).trim.split(' ').toList))
 }
 
-val inputs = Seq("data/day-7-example.txt", "data/day-7.txt").map(readFrom(_))
-val funcs = Seq(minimumCost(identity) _, minimumCost(terminal(_)) _) 
-for(i <- inputs; f <- funcs) println(f(i))
+val knowns = Map(2 -> 1, 4 -> 4, 3 -> 7, 7 -> 8)
+def toDigit(output:String) = knowns.get(output.length)
+def remap(os:OutputValues) = os.map(toDigit(_)).flatten
+def easyDigits(es:Iterator[Entry]) = es.map(e => remap(e.os).length).sum
 
+
+//==============================================================================
+val inputs    = Seq("data/day-8-example.txt", "data/day-8.txt")
+val functions = Seq(easyDigits(_))
+
+for(i <- inputs; f <- functions) println(f(readFrom(i)))

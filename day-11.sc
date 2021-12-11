@@ -1,41 +1,47 @@
 import scala.collection.mutable.{HashSet, Queue}
 
 case class Point(r:Int,c:Int)
-type Energy = List[Array[Int]]
-case class Grid(rows:Int,cols:Int,e:Energy, ps:List[Point])
-
-def energyAtPoint(g:Grid)(p:Point) = g.e(p.r)(p.c)
-def incrementPoint(g:Grid)(p:Point) = g.e(p.r)(p.c) += 1
-def incrementGrid(g:Grid) = for(p <- g.ps) incrementPoint(g)(p)
-def resetPoint(g:Grid)(p:Point) = g.e(p.r)(p.c) = 0
-def validPoint(g:Grid)(p:Point) = p.r >= 0 && p.r < g.rows && p.c >= 0 && p.c < g.cols
-
-def adjacentPoints(p:Point) = (for(r <- p.r-1 to p.r+1; c <- p.c-1 to p.c+1) yield Point(r,c)).filter(_ != p)
-def effectedPoints(p:Point)= adjacentPoints(p).filter(validPoint(g)(_)).filter(energyAtPoint(g)(_) <= 9)
-
-def flashGrid(g:Grid) = {
-  val flashed = new Queue[Point]
-  for(p <- g.ps.filter(energyAtPoint(g)(_) > 9)){
-    val fs = flashBasin(g)(p)
-    flashed ++= fs 
-  }
-  for(p <- flashed) resetPoint(g)(p)
-}
-def flashBasin(g:Grid)(flashPoint:Point):Iterable[Point] = {
-  val todo    = new Queue[Point].addOne(flashPoint)
-  val flashed = new Queue[Point]
-
-  while(todo.isEmpty == false){
-    val p = todo.dequeue
-    if(energyAtPoint(g)(p) > 9){
-      flashed += p
-
-      val incs = effectedPoints(p)
-      for(i <- incs) incrementPoint(g)(i)
-      todo ++= incs.filter(energyAtPoint(g)(_) > 9)  
+case class Grid(rows:Int,cols:Int,e:List[Array[Int]], ps:List[Point]){
+  def energy(p:Point) = this.e(p.r)(p.c)
+  def increment(p:Point) = this.e(p.r)(p.c) += 1
+  def reset(p:Point) = this.e(p.r)(p.c) = 0
+  def isvalid(p:Point) = p.r >= 0 && p.r < this.rows && p.c >= 0 && p.c < this.cols
+  def flash = {
+    val flashed = new Queue[Point]
+    for(p <- this.ps) this.increment(p)
+    for(p <- this.ps.filter(this.energy(_) > 9)){
+      val fs = this.flashBasin(p)
+      flashed ++= fs 
     }
+    for(p <- flashed) this.reset(p)
+    flashed.length
   }
-  flashed.toIterable
+  private def flashBasin(flashPoint:Point):Iterable[Point] = {
+    val todo    = new Queue[Point].addOne(flashPoint)
+    val flashed = new Queue[Point]
+
+    while(todo.isEmpty == false){
+      val p = todo.dequeue
+      if(this.energy(p) > 9){
+        flashed += p
+
+        val incs= (for(r <- p.r-1 to p.r+1; c <- p.c-1 to p.c+1) yield Point(r,c))
+          .filter(_ != p)
+          .filter(this.isvalid(_))
+          .filter(this.energy(_) <= 9)
+
+        for(i <- incs) this.increment(i)
+        todo ++= incs.filter(this.energy(_) > 9)  
+      }
+    }
+    flashed.toIterable
+  }
+  def printEnergyGrid = {
+    for(r <- this.e){ 
+      for(c <- r) if(c < 1 || c > 9) print(Console.BLUE + c + Console.WHITE + ",") else print(c + ",")
+        println 
+      }
+  } 
 }
 //=============================================================================
 def readFrom(filename:String):Grid = {
@@ -49,17 +55,16 @@ def readFrom(filename:String):Grid = {
     Grid(rows,cols, e, (0 until rows).flatMap(r => (0 until cols).map(Point(r,_))).toList) 
 }
 //=============================================================================
-def printEnergy(g:Grid){    
-  for(r <- g.e){ 
-    for(c <- r) if(c < 1 || c > 9) print(Console.BLUE + c + Console.WHITE + ",") else print(c + ",")
-      println 
-    }
+def part1(g:Grid) = (1 to 100).foldLeft(0)((total,_) => total + g.flash)
+def part2(g:Grid) = {
+  var count = 1
+  var all   = g.rows * g.cols
+  while(g.flash != all) count += 1
+  count
 }
-val g = readFrom("data/day-11-example.txt")
-printEnergy(g)
-for(i <- 1 to 2){
-  println("--" + i + "------------------------------")
-  incrementGrid(g)
-  flashGrid(g)
-  printEnergy(g)
-}
+
+println(part1(readFrom("data/day-11-example.txt")))
+println(part1(readFrom("data/day-11.txt")))
+println(part2(readFrom("data/day-11-example.txt")))
+println(part2(readFrom("data/day-11.txt")))
+

@@ -1,9 +1,12 @@
-// Binary Diagnostics
-//
+//=============================================================================
+// Advent of Code 2021 Day (Binary Diagnostics)
+//=============================================================================
+// Principle: 
+
 val on  = '1'
 val off = '0'
 
-def readFrom(filename:String) = scala.io.Source.fromFile(filename).getLines.filter(_.nonEmpty).toList
+def readFile(filename:String) = scala.io.Source.fromFile(filename).getLines.filter(_.nonEmpty).toList
 
 def bitsToDecimal(bits:Seq[Char]) = bits
   .reverse.zipWithIndex                           // reverse bit order so that index with match power of 2
@@ -25,14 +28,19 @@ def matchBits(f:List[String]=>List[Char],readings: List[String], index:Int = 0):
                          val filtered  = readings.filter(_(index) == filterBit)     // filter reading to only those with filterBit at index location
                          matchBits(f, filtered, index+1 )}}                         // recurse with filtered readings and increment index 
 
-def answer1(readings: List[String]) = 
-  bitsToDecimal(mostCommon(readings)) * bitsToDecimal(leastCommon(readings))
+def powerConsumption(readings: List[String]) = {
+  val gammaRate   = bitsToDecimal(mostCommon(readings)) 
+  val epsilonRate = bitsToDecimal(leastCommon(readings))
+  gammaRate * epsilonRate }
 
-def answer2(readings: List[String]) = 
-  bitsToDecimal(matchBits(mostCommon,readings)) * bitsToDecimal(matchBits(leastCommon,readings))
+def lifeSupport(readings: List[String]) = {
+  val co2 = bitsToDecimal(matchBits(mostCommon,readings))
+  val o2  = bitsToDecimal(matchBits(leastCommon,readings)) 
+  co2 * o2 }
 
-// Answers
-for(file <- Seq("data/day-3-example.txt", "data/day-3.txt"); 
-    function <- Seq(answer1(_), answer2(_))){
-       println(function(readFrom(file)))
-    }
+//==ANSWERS====================================================================
+println("Advent of Code 2021 Day 3 (BinaryDiagnostics)")
+println(" part 1 : example : " + powerConsumption(readFile("data/03e")))
+println(" part 1 : actual  : " + powerConsumption(readFile("data/03")))
+println(" part 2 : example : " + lifeSupport(readFile("data/03e")))
+println(" part 2 : actual  : " + lifeSupport(readFile("data/03")))

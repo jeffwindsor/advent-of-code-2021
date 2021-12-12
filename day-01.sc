@@ -1,10 +1,11 @@
-//
-// DAY 1: Sonar Sweep
-//
-def readFrom(filename:String) = {
+//=============================================================================
+// Advent of Code 2021 Day 1 (Sonar Sweep)
+//=============================================================================
+// Principle: zip, windowing, sliding of iterables ??? 
+
+def readFile(filename:String) = {
   scala.io.Source.fromFile(filename).getLines.filter(_.nonEmpty)
-    .map(_.toInt).toSeq
-}
+    .map(_.toInt).toSeq }
 
 // PART 1 : count the number of increases between measurements
 def count_increases(inputs: Seq[Int]) = 
@@ -15,8 +16,9 @@ def count_increases(inputs: Seq[Int]) =
 def count_sum_increases(inputs: Seq[Int]) = 
   count_increases(inputs.sliding(3).map(_.sum).toSeq)
 
-//==PRINT ANSWERS==================================================================================
-for(input <- Seq("data/day-1-example.txt").map(readFile(_))){
-  count_increases(input)
-  count_sum_increases(input)
-}
+//==ANSWERS====================================================================
+println("Advent of Code 2021 Day 1 (Sonar Sweep)")
+println(" part 1 : example : " + count_increases(readFile("data/01e")))
+println(" part 1 : actual  : " + count_increases(readFile("data/01")))
+println(" part 2 : example : " + count_sum_increases(readFile("data/01e")))
+println(" part 2 : actual  : " + count_sum_increases(readFile("data/01")))

@@ -21,16 +21,18 @@ def applyInserts(template:Template, inserts:Inserts) = {
 }
 def answer(steps:Int, template:Template, inserts:Inserts) = { 
   val s = (0 until steps).foldLeft(template)((acc,_) => applyInserts(acc, inserts))
-  val counts = s.groupMapReduce(identity)(_ => 1)(_ + _).map(_._2)
+  val counts = s.groupMapReduce(identity)(_ => BigInt(1))(_ + _).map(_._2)
   counts.max - counts.min
 } 
 
 def part1(template:Template, inserts:Inserts) = answer(10, template, inserts)
+def part2(template:Template, inserts:Inserts) = answer(40, template, inserts)
 
 //==ANSWERS====================================================================
 println("Advent of Code 2021 --- Day 14: Extended Polymerization ---")
 val e = parse("data/14e")
 println(" part 1 : example : " + part1(e._1, e._2))
+//println(" part 2 : example : " + part2(e._1, e._2))
 
 val a = parse("data/14")
 println(" part 1 : actual  : " + part1(a._1,a._2))

@@ -35,6 +35,6 @@ def part2(i:(PairCounts, PairInserts)) = answer(40,i._1,i._2)
 //==ANSWERS====================================================================
 println("Advent of Code 2021 --- Day 14: Extended Polymerization ---")
 println(" part 1 : example : " + part1(parse("data/14e")))
-println(" part 1 : actual : " + part1(parse("data/14")))
+println(" part 1 : actual  : " + part1(parse("data/14")))
 println(" part 2 : example : " + part2(parse("data/14e")))
-println(" part 2 : actual : " + part2(parse("data/14")))
+println(" part 2 : actual  : " + part2(parse("data/14")))

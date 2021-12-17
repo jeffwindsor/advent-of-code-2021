@@ -8,31 +8,21 @@ import scala.collection.mutable.{PriorityQueue,HashMap}
 case class Point(r:Int,c:Int){ def +(that:Point) = Point(this.r+that.r, this.c+that.c) }
 case class QueueItem(total:Int,point:Point)
 type RiskMap = HashMap[Point, Int]
+type MapPoint = (Point, Int)
 
 def parse(filename:String) = {
-  val maps = scala.io.Source.fromFile(filename).getLines
-    .zipWithIndex.map { 
-      case (line,row) => line.zipWithIndex.map { 
-        case (risk,col) => Point(row,col) -> risk.asDigit } 
-    }.flatten
-  new HashMap() ++ maps
-}
-def expandRisk(risk:Int, expandBy:Int) = {
-  val result = (risk + expandBy) % 9
-  if(result == 0) 9 else result
-}
-def expand(riskMap:RiskMap, expansions:Int) = {
-  val es = (1 until expansions)
-  val m = riskMap.keys.map(_.r).max + 1
-  for(rm <- riskMap.toList) riskMap ++= es.map(i => rm._1 + Point((m*i), 0) -> expandRisk(rm._2, i))
-  for(rm <- riskMap.toList) riskMap ++= es.map(i => rm._1 + Point(0, (m*i)) -> expandRisk(rm._2, i))
+  val inputs= scala.io.Source.fromFile(filename).getLines.zipWithIndex.map { 
+      case (l,r) => l.zipWithIndex.map { 
+        case (risk,c) => Point(r,c) -> risk.asDigit }}.flatten
+  new HashMap() ++ inputs
 }
 
 val byLowestTotalRisk = Ordering.by((r:QueueItem) => r.total).reverse
-def startQueue = new PriorityQueue[QueueItem]()(byLowestTotalRisk) += QueueItem(0, Point(0,0))
+val start = QueueItem(0, Point(0,0))
+def startQueue = new PriorityQueue[QueueItem]()(byLowestTotalRisk) += start
 def neighbors = List(Point(0,1),Point(0,-1),Point(1,0),Point(-1,0))
 def validPoint(p:Point, limit:Int) = p.r >= 0 && p.r <= limit && p.c >= 0 && p.c <= limit
-def size(rm:RiskMap) = rm.keys.map(_.r).max
+def maxIndex(rm:RiskMap) = rm.keys.map(_.r).max
 
 @tailrec
 def shortestPath(riskMap:RiskMap, pq:PriorityQueue[QueueItem], limit:Int): Int = {
@@ -50,11 +40,21 @@ def shortestPath(riskMap:RiskMap, pq:PriorityQueue[QueueItem], limit:Int): Int =
   }
   shortestPath(riskMap, pq, limit)
 }
+def part1(rm:RiskMap) = shortestPath(rm, startQueue, maxIndex(rm))
 
-def part1(rm:RiskMap) = shortestPath(rm, startQueue, rm.keys.map(_.r).max)
+def shiftRisk(risk:Int, expandBy:Int) = (risk + expandBy - 1) % 9 + 1
+def shiftRow(gridSize:Int)(row:Int) = Point(gridSize * row, 0)
+def shiftCol(gridSize:Int)(col:Int) = Point(0, gridSize * col)
+def shiftGrids(shift:Int => Point)(mp:MapPoint, times:Int, size:Int) = 
+  (1 until times).map(i => (mp._1 + shift(i), shiftRisk(mp._2, i)))
+def expand(riskMap:RiskMap, times:Int) = {
+  val size = maxIndex(riskMap) + 1
+  for(mp <- riskMap.toList) riskMap ++= shiftGrids(shiftRow(size))(mp, times, size)
+  for(mp <- riskMap.toList) riskMap ++= shiftGrids(shiftCol(size))(mp, times, size)
+}
 def part2(rm:RiskMap) = { 
   expand(rm,5)
-  shortestPath(rm, startQueue, rm.keys.map(_.r).max)
+  shortestPath(rm, startQueue, maxIndex(rm))
 }
 
 //==ANSWERS====================================================================
@@ -63,11 +63,3 @@ println(" part 1 : example : " + part1(parse("data/15e")))
 println(" part 1 : actual  : " + part1(parse("data/15")))
 println(" part 2 : example : " + part2(parse("data/15e")))
 println(" part 2 : actual  : " + part2(parse("data/15")))
-
-//val max = test.keys.map(_.r).max
-//for(r <- 0 to max) {
-//  for(c <- 0 to max) { 
-//    print(test(Point(r,c)) + " ") 
-//  }
-//  println
-//}

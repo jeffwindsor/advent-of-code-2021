@@ -1,48 +1,37 @@
+import scala.annotation.tailrec
 
-//=============================================================================
-// Advent of Code 2021 --- Day 13: Transparent Origami ---
-//=============================================================================
-// Principle: graphs, depth first search 
-//
-trait FoldPaper
-case class FoldX(at:Int) extends FoldPaper
-case class FoldY(at:Int) extends FoldPaper
+trait Fold
+case class FoldX(at:Int) extends Fold
+case class FoldY(at:Int) extends Fold
 case class Point(x:Int,y:Int)
 type Points = Set[Point]
-case class Input(points:Points, folds:List[FoldPaper])
+type FoldPapers = List[Fold]
 
-def parse(filename:String) = {
-  val inputs = scala.io.Source.fromFile(filename).getLines.span(!_.isEmpty)
-  val points = inputs._1.map(_.split(",")).map(a => Point(a(0).toInt,a(1).toInt)).toSet
-  val folds  = inputs._2.drop(1).map(_.split("=")).map{
-    case Array("fold along y", y) => FoldY(y.toInt)
-    case Array("fold along x", x) => FoldX(x.toInt) }
-    .toList
-  Input(points,folds)
-}
+def isDataPoint(s:String) = !s.startsWith("fold")
+def dataPoints(filename:String) =
+  Input.asNonEmptyLines(filename).takeWhile(isDataPoint).map(_.split(","))
+    .map(a => Point(a(0).toInt,a(1).toInt)).toSet
+def dataFolds(filename:String) =
+  Input.asNonEmptyLines(filename).dropWhile(isDataPoint).map(_.split("=")).map {
+      case Array("fold along y", y) => FoldY(y.toInt)
+      case Array("fold along x", x) => FoldX(x.toInt) }
 
-def foldPaper(ps:Points, fp:FoldPaper):Points = fp match {
+def foldPaper(ps:Points, fp:Fold):Points = fp match
   case FoldX(at) => ps.filter(at > _.x) ++ ps.filter(at < _.x).map(p => Point(2 * at - p.x, p.y))
   case FoldY(at) => ps.filter(at > _.y) ++ ps.filter(at < _.y).map(p => Point(p.x, 2 * at - p.y))
-}
 
-def part1(i:Input) = foldPaper(i.points, i.folds.head).size
-def part2(i:Input):Points = i.folds match {
-    case f::fs  => part2(Input(foldPaper(i.points, f),fs))
-    case List() => i.points
-}
+@tailrec
+def foldPapers(ps:Points, folds:FoldPapers): Points = folds match
+  case f::fs  => foldPapers(foldPaper(ps,f), fs)
+  case List() => ps
 
+def part1(f:String) = foldPaper(dataPoints(f), dataFolds(f).head).size
+def part2(f:String) = foldPapers(dataPoints(f),dataFolds(f))
 
-//==ANSWERS====================================================================
-println("Advent of Code 2021 --- Day 13: Transparent Origami ---")
-println(" part 1 : example : " + part1(parse("data/13e")))
-println(" part 1 : actual  : " + part1(parse("data/13")))
-println("part 2 : example : ")
-printPaper(part2(parse("data/13e")))
-println("part 2 : actual  : ")
-printPaper(part2(parse("data/13")))
+Output.printResults(13,part1,part2)
 
-def printPaper(ps:Points) = {
+//================================================================================
+def printPaper(ps:Points): Unit = {
   val mx = ps.map(_.x).max
   val my = ps.map(_.y).max
   val g = ps.groupMap(_.y)(_.x)

@@ -1,48 +1,34 @@
-//=============================================================================
-// Advent of Code 2021 Day 12 (Passage Pathing)
-//=============================================================================
-// Principle: graphs, depth first search 
-//
 type Graph = Map[String, List[String]]
 type Node = String
 val separator = ","
 
-def parse(filename:String):Graph = {
-  val inputs = scala.io.Source.fromFile(filename).getLines.filter(_.nonEmpty)
-    .map(_.split('-')).toList
-  val labels    = inputs.flatten.toSet
-  val size      = labels.size
-  val undirected= (inputs.map(a => (a(0),a(1))) ++ inputs.map(a =>(a(1),a(0))))
-  undirected.groupMap{ case (a,b) => a }{ case (a,b) => b}
-}
+def data(filename:String):Graph = {
+  val inputs = Input.asNonEmptyLines(filename).map(_.split('-')).toList
+  (inputs.map(a => (a(0),a(1))) ++ inputs.map(a =>(a(1),a(0))))
+    .groupMap{ case (a,_) => a }{ case (_,b) => b} }
 
 def findPathsVisitSmallCavesOnce(g:Graph, visited:Set[Node], vertice:Node):Seq[String] = {
   val visitedNow = if(vertice == vertice.toUpperCase) visited else visited + vertice
-  g(vertice).map{
-    case "end"   => Seq(vertice + separator + "end")
-    case "start" => Seq(vertice)
-    case v if(visitedNow.contains(v)) => Seq(vertice)
-    case v => findPathsVisitSmallCavesOnce(g, visitedNow, v).map(vertice + separator + _)
-  }.flatten
-}
-def part1(g:Graph) = findPathsVisitSmallCavesOnce(g, Set.empty, "start").filter(_.endsWith("end")).length
-
-def findPathsVisitSmallCavesSpecial(g:Graph, special:Option[Node], visited:Set[Node], vertice:Node):Seq[String] = {
-  val visitedNow = if(vertice == vertice.toUpperCase) visited else visited + vertice
-  g(vertice).map{
+  g(vertice).flatMap {
     case "end" => Seq(vertice + separator + "end")
     case "start" => Seq(vertice)
-    case v if(visitedNow.contains(v)) => special match {
-      case Some(_) => Seq(vertice)
-      case None => findPathsVisitSmallCavesSpecial(g, Some(v), visitedNow, v).map(vertice + separator + _) }
-    case v => findPathsVisitSmallCavesSpecial(g, special, visitedNow, v).map(vertice + separator + _ )
-  }.flatten
+    case v if (visitedNow.contains(v)) => Seq(vertice)
+    case v => findPathsVisitSmallCavesOnce(g, visitedNow, v).map(vertice + separator + _)
+  }
 }
-def part2(g:Graph) = findPathsVisitSmallCavesSpecial(g, None, Set.empty, "start").filter(_.endsWith("end")).length
+def findPathsVisitSmallCavesSpecial(g:Graph, visited:Set[Node], vertice:Node, special:Option[Node]):Seq[String] = {
+  val visitedNow = if(vertice == vertice.toUpperCase) visited else visited + vertice
+  g(vertice).flatMap {
+    case "end" => Seq(vertice + separator + "end")
+    case "start" => Seq(vertice)
+    case v if (visitedNow.contains(v)) => special match {
+      case Some(_) => Seq(vertice)
+      case None => findPathsVisitSmallCavesSpecial(g, visitedNow, v, Some(v)).map(vertice + separator + _)
+    }
+    case v => findPathsVisitSmallCavesSpecial(g, visitedNow, v, special).map(vertice + separator + _)
+  }
+}
 
-//==ANSWERS====================================================================
-println("Advent of Code 2021 12 (Passage Pathing)")
-println(" part 1 : example : " + part1(parse("data/12e")))
-println(" part 1 : actual  : " + part1(parse("data/12")))
-println(" part 2 : example : " + part2(parse("data/12e")))
-println(" part 2 : actual  : " + part2(parse("data/12")))
+def part1(f:String) = findPathsVisitSmallCavesOnce(data(f), Set.empty, "start").count(_.endsWith("end"))
+def part2(f:String) = findPathsVisitSmallCavesSpecial(data(f), Set.empty, "start", None).count(_.endsWith("end"))
+Output.printResults(12,part1,part2)

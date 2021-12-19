@@ -5,6 +5,7 @@
 project/
 .vscode/
 .bloop/
+.idea/
 
 # User-specific stuff
 .idea/**/workspace.xml

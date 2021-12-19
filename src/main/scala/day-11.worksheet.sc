@@ -1,19 +1,18 @@
 import scala.collection.mutable
 
-case class Point(r:Int,c:Int)
 case class Grid(rows:Int,cols:Int,e:List[Array[Int]], ps:List[Point])
 
 def data(filename:String):Grid = {
   val e = Input.asNonEmptyLines(filename).map(_.map(_.asDigit).toArray)
   val rows = e.length
   val cols = e.head.length
-  Grid(rows,cols, e, (0 until rows).flatMap(r => (0 until cols).map(Point(r,_))).toList) }
+  Grid(rows,cols, e, (0 until rows).flatMap(r => (0 until cols).map(Point(_,r))).toList) }
 
 
-def energy(g:Grid, p:Point):Int = g.e(p.r)(p.c)
-def increment(g:Grid, p:Point): Unit = g.e(p.r)(p.c) += 1
-def reset(g:Grid, p:Point): Unit = g.e(p.r)(p.c) = 0
-def isValid(g:Grid, p:Point):Boolean = p.r >= 0 && p.r < g.rows && p.c >= 0 && p.c < g.cols
+def energy(g:Grid, p:Point):Int = g.e(p.y)(p.x)
+def increment(g:Grid, p:Point): Unit = g.e(p.y)(p.x) += 1
+def reset(g:Grid, p:Point): Unit = g.e(p.y)(p.x) = 0
+def isValid(g:Grid, p:Point):Boolean = p.y >= 0 && p.y < g.rows && p.x >= 0 && p.x < g.cols
 
 def flashBasin(g:Grid, flashPoint:Point):Iterable[Point] = {
   val todo    = new mutable.Queue[Point].addOne(flashPoint)
@@ -23,7 +22,7 @@ def flashBasin(g:Grid, flashPoint:Point):Iterable[Point] = {
     val p = todo.dequeue
     if(energy(g, p) > 9){
       flashed += p
-      val incs= (for(r <- p.r-1 to p.r+1; c <- p.c-1 to p.c+1) yield Point(r,c))
+      val incs= (for(r <- p.y-1 to p.y+1; c <- p.x-1 to p.x+1) yield Point(c,r))
         .filter(_ != p)
         .filter(isValid(g,_))
         .filter(energy(g, _) <= 9)

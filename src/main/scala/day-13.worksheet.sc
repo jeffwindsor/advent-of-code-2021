@@ -3,9 +3,7 @@ import scala.annotation.tailrec
 trait Fold
 case class FoldX(at:Int) extends Fold
 case class FoldY(at:Int) extends Fold
-case class Point(x:Int,y:Int)
 type Points = Set[Point]
-type FoldPapers = List[Fold]
 
 def isDataPoint(s:String) = !s.startsWith("fold")
 def dataPoints(filename:String) =
@@ -21,7 +19,7 @@ def foldPaper(ps:Points, fp:Fold):Points = fp match
   case FoldY(at) => ps.filter(at > _.y) ++ ps.filter(at < _.y).map(p => Point(p.x, 2 * at - p.y))
 
 @tailrec
-def foldPapers(ps:Points, folds:FoldPapers): Points = folds match
+def foldPapers(ps:Points, folds:List[Fold]): Points = folds match
   case f::fs  => foldPapers(foldPaper(ps,f), fs)
   case List() => ps
 

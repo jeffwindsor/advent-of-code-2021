@@ -6,7 +6,7 @@ type Heights = List[Array[Int]]
 
 def data(filename:String) = Input.asNonEmptyLines(filename).map(_.map(_.asDigit).toArray)
 def points(hs:Heights) = hs.indices.flatMap(r => hs(r).indices.map(Point(r,_)))
-def height(hs:Heights)(p:Point):Height = hs(p.r)(p.c)
+def height(hs:Heights)(p:Point):Height = hs(p.x)(p.y)
 def risk(hs:Heights)(p:Point):Int = height(hs)(p) + 1
 def lowpoint(hs:Heights)(p:Point):Boolean = height(hs)(p) match {
   case 9 => false

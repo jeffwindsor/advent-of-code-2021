@@ -1,4 +1,3 @@
-case class Point(x:Int, y:Int)
 case class Line(a:Point, b:Point)
 
 def data(filename:String): List[Line] = Input.asNonEmptyLines(filename)

@@ -1,3 +1,4 @@
+import shared.{Input, Output}
 trait Result
 case class Corrupted(score:BigInt) extends Result
 case class Incomplete(score:BigInt) extends Result

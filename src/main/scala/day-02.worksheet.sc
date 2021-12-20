@@ -1,3 +1,5 @@
+import shared.{Input, Output}
+
 case class Location(position:Int, depth:Int, aim:Int)
 type Move = (String,Int)
 

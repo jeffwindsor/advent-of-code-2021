@@ -1,3 +1,5 @@
+import shared.{Input, Output}
+
 import scala.annotation.tailrec
 
 val on  = '1'

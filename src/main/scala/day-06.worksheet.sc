@@ -1,3 +1,4 @@
+import shared.{Input, Output}
 import scala.annotation.tailrec
 type Fish = BigInt
 type Age  = Int

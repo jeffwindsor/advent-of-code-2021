@@ -1,3 +1,4 @@
+import shared.{Input, Output,Point}
 import scala.annotation.tailrec
 
 trait Fold

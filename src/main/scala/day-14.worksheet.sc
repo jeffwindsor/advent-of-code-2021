@@ -1,17 +1,14 @@
-//=============================================================================
-// Advent of Code 2021 --- Day 14: Extended Polymerization ---
-//=============================================================================
-// Principle:
+import shared.{Input, Output}
 type Pair = String
 type PairCount = (Pair,BigInt)
 type PairCounts = Map[Pair,BigInt]
 type PairInserts = Map[Pair, String]
 
-def parse(filename:String) = {
-  val (t,i) = scala.io.Source.fromFile(filename).getLines.toList.span(!_.isEmpty)
-  val pcs = t.head.sliding(2).toList.groupBy(identity).map{ case(k,vs) => (k, BigInt(vs.length))}
-  val ins  = i.tail.map(_.split(" -> ")).map(a => a(0) -> a(1)).toMap
-  (pcs,ins) }
+def dataPairCounts(filename:String) = 
+  Input.asNonEmptyLines(filename).head.sliding(2).toList.groupBy(identity).map{ case(k,vs) => (k, BigInt(vs.length))}
+  
+def dataInserts(filename:String) = 
+  Input.asNonEmptyLines(filename).tail.map(_.split(" -> ")).map(a => a(0) -> a(1)).toMap
 
 def addInsert(pc:PairCount, pis:PairInserts) = {
   val (pair, count) = pc
@@ -29,12 +26,7 @@ def answer(steps:Int, pcs:PairCounts, pis:PairInserts) = {
   val counts = letterCounts.map(_._2)
   counts.max - counts.min }
 
-def part1(i:(PairCounts, PairInserts)) = answer(10,i._1,i._2)
-def part2(i:(PairCounts, PairInserts)) = answer(40,i._1,i._2)
+def part1(f:String) = answer(10,dataPairCounts(f),dataInserts(f))
+def part2(f:String) = answer(40,dataPairCounts(f),dataInserts(f))
 
-//==ANSWERS====================================================================
-println("Advent of Code 2021 --- Day 14: Extended Polymerization ---")
-println(" part 1 : example : " + part1(parse("data/14e")))
-println(" part 1 : actual  : " + part1(parse("data/14")))
-println(" part 2 : example : " + part2(parse("data/14e")))
-println(" part 2 : actual  : " + part2(parse("data/14")))
+Output.printResults(14,part1,part2)

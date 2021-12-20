@@ -1,3 +1,4 @@
+import shared.{Input, Output}
 type CostF    = Int => Int
 type Crab     = Int
 type Crabs    = Iterable[Crab]

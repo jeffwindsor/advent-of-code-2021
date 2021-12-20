@@ -1,3 +1,4 @@
+import shared.{Input, Output, Point}
 import scala.collection.mutable
 
 case class Grid(rows:Int,cols:Int,e:List[Array[Int]], ps:List[Point])

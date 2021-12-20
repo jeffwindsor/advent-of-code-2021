@@ -1,3 +1,4 @@
+import shared.{Input, Output}
 //
 //  Day 8: Seven Segment Search
 //                                            digit    wires    total on wires

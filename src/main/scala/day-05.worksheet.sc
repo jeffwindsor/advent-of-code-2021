@@ -1,3 +1,4 @@
+import shared.{Input, Output,Point}
 case class Line(a:Point, b:Point)
 
 def data(filename:String): List[Line] = Input.asNonEmptyLines(filename)

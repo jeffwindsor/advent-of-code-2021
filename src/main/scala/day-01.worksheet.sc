@@ -1,3 +1,5 @@
+import shared.{Input, Output}
+
 def data(filename:String):List[Int] = Input.asNonEmptyLines(filename).map(_.toInt)
 
 def count(inputs: List[Int]) = inputs.sliding(2).count{ case Seq(a,b) => a < b }

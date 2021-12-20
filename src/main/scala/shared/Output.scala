@@ -1,3 +1,5 @@
+package shared
+
 object Output{
   type AnswerFunc = String => Any
   def printResults(day:Int, part1:AnswerFunc, part2:AnswerFunc):Unit={

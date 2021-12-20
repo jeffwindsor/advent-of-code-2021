@@ -1,4 +1,5 @@
 import scala.annotation.tailrec
+import shared.{Input, Output}
 
 type Graph = Map[String, List[String]]
 type Node = String
@@ -9,33 +10,20 @@ def data(filename:String) =
   (inputs.map(a => (a(0),a(1))) ++ inputs.map(a =>(a(1),a(0))))
     .groupMap{ case (a,_) => a }{ case (_,b) => b}
 
-def findPathsVisitSmallCavesOnce(g:Graph, visited:Set[Node], current:Node):Seq[String] = {
-  val visitedNow = if(current == current.toUpperCase) visited else visited + current
+def findPathsVisitSmallCaves(g:Graph, visited:Set[Node], current:Node, visitTwice: Option[Node]):Seq[String] = {
+  val vistedOnce = if(current == current.toUpperCase) visited else visited + current
   g(current).flatMap {
     case "end" => Seq(current + separator + "end")
     case "start" => Seq(current)
-    case v if visitedNow.contains(v) => Seq(current)
-    case v => findPathsVisitSmallCavesOnce(g, visitedNow, v).map(current + separator + _)
-  }
-}
-
-def findPathsVisitSmallCavesSpecial(g:Graph) = {
-  def inner(visited: Set[Node])(current: Node, special: Option[Node]): Seq[String] = {
-    val visitedNow = if (current == current.toUpperCase) visited else visited + current
-    val innerCurry = inner(visitedNow) _
-    g(current).flatMap {
-      case "end" => Seq(current + separator + "end")
-      case "start" => Seq(current)
-      case v if visitedNow.contains(v) => special match {
-        case Some(_) => Seq(current)
-        case None => innerCurry(v, Some(v)).map(current + separator + _)
-      }
-      case v => innerCurry(v, special).map(current + separator + _)
+    case v if vistedOnce.contains(v) => visitTwice match {
+      case Some(_) => Seq(current)
+      case None =>  findPathsVisitSmallCaves(g, vistedOnce, v, Some(v)).map(current + separator + _)
     }
+    case v => findPathsVisitSmallCaves(g, vistedOnce, v, visitTwice).map(current + separator + _)
   }
-  inner(Set.empty)("start", None)
 }
 
-def part1(f:String) = findPathsVisitSmallCavesOnce(data(f), Set.empty, "start").count(_.endsWith("end"))
-def part2(f:String) = findPathsVisitSmallCavesSpecial(data(f)).count(_.endsWith("end"))
-Output.printResults(12,part1,part2)
+def part1(f:String) = findPathsVisitSmallCaves(data(f), Set.empty, "start", Some("none-twice")).count(_.endsWith("end"))
+def part2(f:String) = findPathsVisitSmallCaves(data(f), Set.empty, "start", None).count(_.endsWith("end"))
+
+Output.printResults(12, part1, part2)

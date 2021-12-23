@@ -1,5 +1,4 @@
 import shared.{Input, Output}
-
 import scala.annotation.tailrec
 
 val on  = '1'
@@ -22,11 +21,11 @@ def leastCommon(readings:List[String]):List[Char] =
   mostCommon(readings).map(c => if (c == on) off else on)   // invert most common
 
 @tailrec
-def matchBits(f:List[String]=>List[Char], readings: List[String], index:Int = 0): String = readings match {
+final def matchBits(f:List[String]=>List[Char], readings: List[String], index:Int = 0): String = readings match
   case List(answer) => answer                                                       // quit on single value
-  case _            => { val filterBit = f(readings)(index)                         // get bit to filter readings at index
+  case _            =>   val filterBit = f(readings)(index)                         // get bit to filter readings at index
                          val filtered  = readings.filter(_(index) == filterBit)     // filter reading to only those with filterBit at index location
-                         matchBits(f, filtered, index+1 )}}                         // recurse with filtered readings and increment index
+                         matchBits(f, filtered, index+1 )                           // recurse with filtered readings and increment index
 
 def powerConsumption(readings: List[String]) = {
   val gammaRate   = bitsToDecimal(mostCommon(readings))
@@ -40,4 +39,6 @@ def lifeSupport(readings: List[String]) = {
 
 def part1(f:String) = powerConsumption(data(f))
 def part2(f:String) = lifeSupport(data(f))
-Output.printResults(3, part1, part2)
+
+Output.printResults(3,part1)
+Output.printResults(3,part2)

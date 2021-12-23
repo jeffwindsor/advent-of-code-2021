@@ -24,4 +24,5 @@ def part2(filename:String) = {
   val scores = Input.asNonEmptyLines(filename).map(process).collect{ case Incomplete(s) => s }.sorted
   scores(scores.length / 2) }
 
-Output.printResults(10,part1,part2)
+Output.printResults(10,part1)
+Output.printResults(10,part2)

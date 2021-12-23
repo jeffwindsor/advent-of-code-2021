@@ -48,4 +48,6 @@ def play(b:Board, number:Int) = b match {
 def part1(f:String) = play(data(f)).minBy(_.index).score
 def part2(f:String) = play(data(f)).maxBy(_.index).score
 
-Output.printResults(4, part1,part2)
+Output.printResults(4,part1)
+Output.printResults(4,part2)
+

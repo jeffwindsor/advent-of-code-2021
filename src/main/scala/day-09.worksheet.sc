@@ -39,8 +39,5 @@ def part2(f:String) = {
     .sorted(Ordering.Int.reverse).take(3).product
 }
 
-Output.printResults(
-  9,
-  part1,
-  part2
-)
+Output.printResults(9,part1)
+Output.printResults(9,part2)

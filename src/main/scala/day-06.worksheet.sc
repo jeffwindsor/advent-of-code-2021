@@ -17,4 +17,7 @@ def next(p:Map[Age,Fish]):Map[Age,Fish] = {
                    case None            => newPopulation } }
 def part1(f:String) = run(80,data(f))
 def part2(f:String) = run(256,data(f))
-Output.printResults(6, part1, part2)
+
+Output.printResults(6,part1)
+Output.printResults(6,part2)
+

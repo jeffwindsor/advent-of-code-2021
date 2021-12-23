@@ -14,4 +14,6 @@ def count(lines:List[Line]) = lines.flatMap(points).groupBy(a => a).values.count
 def part1(f:String) = count(data(f).filter(isHoV))
 def part2(f:String) = count(data(f))
 
-Output.printResults(5, part1, part2)
+Output.printResults(5,part1)
+Output.printResults(5,part2)
+

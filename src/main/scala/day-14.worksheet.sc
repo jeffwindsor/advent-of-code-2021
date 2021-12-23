@@ -29,4 +29,5 @@ def answer(steps:Int, pcs:PairCounts, pis:PairInserts) = {
 def part1(f:String) = answer(10,dataPairCounts(f),dataInserts(f))
 def part2(f:String) = answer(40,dataPairCounts(f),dataInserts(f))
 
-Output.printResults(14,part1,part2)
+Output.printResults(14,part1)
+Output.printResults(14,part2)

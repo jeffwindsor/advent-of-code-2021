@@ -27,4 +27,6 @@ def answer(movement:(Location,Move) => Location, moves: Iterable[Move]): Int = {
 
 def part1(f:String) = answer(noAim, data(f))
 def part2(f:String) = answer(withAim, data(f))
-Output.printResults(2,part1,part2)
+
+Output.printResults(2,part1)
+Output.printResults(2,part2)

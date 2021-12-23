@@ -18,4 +18,5 @@ def minimumCost(getCost:(Int,Int)=>Int, costs:Iterable[Int]) =
 def part1(f:String) = minimumCost(costAtPosition, data(f))
 def part2(f:String) = minimumCost(triangleCostAtPostion, data(f))
 
-Output.printResults(7, part1, part2)
+Output.printResults(7,part1)
+Output.printResults(7,part2)

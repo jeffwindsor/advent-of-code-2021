@@ -50,4 +50,5 @@ def part2(f:String) =
   expand(rm,5)
   shortestPath(rm, startQueue, maxIndex(rm))
 
-Output.printResults(15,part1,part2)
+Output.printResults(15,part1)
+Output.printResults(15,part2)

@@ -55,4 +55,5 @@ def part2(file:String) = data(file).map{ e =>
     val p2n = pattern2Number(e.head)
     e(1).map(p2n(_)).mkString.toInt }.sum
 
-Output.printResults(8, part1, part2)
+Output.printResults(8,part1)
+Output.printResults(8,part2)

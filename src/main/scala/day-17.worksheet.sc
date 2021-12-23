@@ -27,7 +27,9 @@ def onTargetVelocities(t:Target) =
 def part1(f:String) = onTargetVelocities(data(f)).map(_._2).max.triangleNumber
 def part2(f:String) = onTargetVelocities(data(f)).length
 
-Output.printResults(17,part1,part2)
+Output.printResults(17,part1)
+Output.printResults(17,part2)
+
 
 //===============================================================
 // TESTS : Trying it out with worksheets

@@ -26,4 +26,5 @@ def findPathsVisitSmallCaves(g:Graph, visited:Set[Node], current:Node, visitTwic
 def part1(f:String) = findPathsVisitSmallCaves(data(f), Set.empty, "start", Some("none-twice")).count(_.endsWith("end"))
 def part2(f:String) = findPathsVisitSmallCaves(data(f), Set.empty, "start", None).count(_.endsWith("end"))
 
-Output.printResults(12, part1, part2)
+Output.printResults(12,part1)
+Output.printResults(12,part2)
